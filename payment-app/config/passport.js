@@ -12,6 +12,7 @@ const { Strategy: OpenIDStrategy } = require('passport-openid');
 const { OAuthStrategy } = require('passport-oauth');
 const { OAuth2Strategy } = require('passport-oauth');
 const _ = require('lodash');
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 
 const User = require('../models/User');
 
@@ -587,6 +588,16 @@ passport.use('pinterest', new OAuth2Strategy({
     });
   });
 }));
+
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.algorithms = ['HS256'];
+opts.secretOrKey = 'secret';
+passport.use(new JwtStrategy(opts, ((jwtPayload, done) => {
+  done(null, {
+    _id: 'validClient'
+  });
+})));
 
 /**
  * Login Required middleware.
